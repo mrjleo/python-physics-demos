@@ -60,7 +60,6 @@ class Ball(object):
 			
 
 	def move(self, dt):
-		print(dt)
 		a = self.F / self.mass
 		self.v = self.v * (1 - damp) + a * dt
 		self.pos = self.pos + self.v * dt
