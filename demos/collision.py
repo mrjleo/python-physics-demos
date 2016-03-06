@@ -8,10 +8,11 @@ import numpy as np
 
 # gravity
 g = 9.798
-# feather constant
-K = 1000
+# feather constants
+K1 = 1000 # when ball still moves towards obstacle
+K2 = 100 # when ball has bounced off obstacle
 # damping
-damp = 0.001
+damp = 0
 
 
 DELTA = 0.01
@@ -45,6 +46,8 @@ class Ball(object):
 
 	def react(self, obstacle):
 		dist = self.distance(obstacle)
+
+		# continuous collision detection
 		if dist < self.radius:
 			
 			# make normal point in right direction (towards the ball)
@@ -53,10 +56,13 @@ class Ball(object):
 			else:
 				obs_normal = obstacle.normal
 
-			d = obs_normal * (self.radius - dist)
+			# check whether velocity points in same direction as the normal
+			if np.dot(obs_normal, self.v) < 0:
+				k = K1
+			else:
+				k = K2
 
-			# F = k(d * n)n
-			self.F = self.F + K * np.dot(d, obs_normal) * obs_normal
+			self.F = self.F + k * (self.radius - dist) * obs_normal
 			
 
 	def move(self, dt):
@@ -108,6 +114,7 @@ def simulate(dt):
 		for o in obstacles:
 			b.react(o)
 		b.move(DELTA * SPEED)
+
 
 @window.event
 def on_draw():
